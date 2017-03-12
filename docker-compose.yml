@@ -1,0 +1,16 @@
+version: '2'
+services:
+  main:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    command: python app/main.py
+    env_file: .env
+  test:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    command: pytest -s
+    env_file: .env
