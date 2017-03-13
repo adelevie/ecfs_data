@@ -1,6 +1,7 @@
 import os
 import urllib
 import requests
+from IPython import embed
 
 class ECFSClient(object):
     def __init__(self, **kwargs):
@@ -21,7 +22,24 @@ class ECFSClient(object):
         response = self.get(path, params=params, decodeUrl=True)
         return response
 
+    def getAllFilingsByProceeding(self, proceeding, **kwargs):
+        firstResponse = self.getFilingsByProceeding(proceeding, **kwargs)
+        firstFilings = firstResponse.json()['filings']
+        resultsCount = self._getResultsCountFromResponse(firstResponse, proceeding)
+        if resultsCount < len(firstFilings):
+            pass
+        else:
+            return firstFilings
+
     # private methods
+    def _getResultsCountFromResponse(self, response, proceeding):
+        aggregations = response.json()['aggregations']
+        proceedingInfo = aggregations['proceedings_name']
+        buckets = proceedingInfo['buckets']
+        resultsCount = list(filter(lambda x: x['key'] == proceeding, buckets))[0]['doc_count']
+        return resultsCount
+
+
     def _preparedRequest(self, method, url, params, decodeUrl):
         request = requests.Request(method, url, params=params)
         preparedRequest = request.prepare()

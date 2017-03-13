@@ -1,3 +1,5 @@
 requests
 responses
 pytest
+mock
+IPython
